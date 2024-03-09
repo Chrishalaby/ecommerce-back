@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Attribute, AttributeValue } from './attribute.entity';
 
 @Entity()
 export class Product {
@@ -16,4 +23,26 @@ export class Product {
 
   @Column()
   stock: number;
+
+  @OneToMany(
+    () => ProductAttribute,
+    (productAttribute) => productAttribute.product,
+    { cascade: true },
+  )
+  attributes: ProductAttribute[];
+}
+
+@Entity()
+export class ProductAttribute {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @ManyToOne(() => Product, (product) => product.attributes)
+  product: Product;
+
+  @ManyToOne(() => Attribute)
+  attribute: Attribute;
+
+  @ManyToOne(() => AttributeValue)
+  attributeValue: AttributeValue;
 }
