@@ -22,7 +22,7 @@ export class Product {
   price: number;
 
   @Column()
-  stock: number;
+  inStock: boolean;
 
   @OneToMany(
     () => ProductAttribute,
@@ -30,6 +30,9 @@ export class Product {
     { cascade: true },
   )
   attributes: ProductAttribute[];
+
+  @OneToMany(() => Image, (image) => image.product, { cascade: true })
+  images: Image[];
 }
 
 @Entity()
@@ -45,4 +48,16 @@ export class ProductAttribute {
 
   @ManyToOne(() => AttributeValue)
   attributeValue: AttributeValue;
+}
+
+@Entity()
+export class Image {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  url: string;
+
+  @ManyToOne(() => Product, (product) => product.images)
+  product: Product;
 }

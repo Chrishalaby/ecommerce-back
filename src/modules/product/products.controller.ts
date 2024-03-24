@@ -6,18 +6,28 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateProductDto } from 'src/dto/create-product.dto';
 import { UpdateProductDto } from 'src/dto/update-product.dto';
+import { Product } from 'src/entities/product.entity';
 import { ProductsService } from './products.service';
 
-@Controller('products')
+@Controller('product')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  @UseInterceptors(FilesInterceptor('images', 10))
+  async create(
+    @UploadedFiles() images: Express.Multer.File[],
+    @Req() req,
+  ): Promise<Product> {
+    const createProductDto: CreateProductDto = JSON.parse(req.body.product);
+    return await this.productsService.create(createProductDto, images);
   }
 
   @Get()
